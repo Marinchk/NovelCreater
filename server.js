@@ -76,6 +76,13 @@ app.post('/scenes', async (req, res) => {
     res.status(400).json({ message: 'сцена с таким именем уже существует' })
 })
 
+app.delete('/scenes', async (req, res) => {
+
+  await scenes.deleteMany({})
+  res.status(200).json({ message: 'Все сцены удалены' })
+
+})
+
 app.delete('/scenes/:name', async (req, res) => {
   const deleteScene = await scenes.findOne({ name: req.params.name })
 
@@ -87,12 +94,6 @@ app.delete('/scenes/:name', async (req, res) => {
   }
 })
 
-app.delete('/scenes', async (req, res) => {
-
-  scenes.deleteMany({})
-  res.status(200).json({ message: 'Все сцены удалены' })
-
-})
 
 app.listen(port, () => {
   console.log('сервер запущен на порту ', port, ' ...')
