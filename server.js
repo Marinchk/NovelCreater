@@ -4,14 +4,15 @@ import express, { response } from 'express'
 import bodyParser from 'body-parser'
 import path from 'path'
 import cookieParser from 'cookie-parser'
-
-
+import dotenv from 'dotenv'
+import { db } from './db.js'
 import scenes from './models/scenes.js'
 
+dotenv.config()
 
-const port = 3000
+const port = process.env.PORT
 const corsOptions = {
-  origin: ['localhost', '46.36.223.228']
+  origin: ['localhost', process.env.IP_HOST]
 }
 const app = express()
 
@@ -22,37 +23,31 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cookieParser())
 
-// app.get('/ping/:param', cors(corsOptions), (req, res) => {
-//   const headIndex = req.rawHeaders.findIndex(el => el === 'StupidHead')
-//   const pook = 'book'
-//   res.status(404).send('amazing '
-//     + req.params.param + ' '
-//     + req.query.var + ' '
-//     + req.rawHeaders[headIndex + 1] + ' '
-//     + req.body.name)
-// })
-
 app.get('/scenes', async (req, res) => {
   const sceneArray = await scenes.find({})
-  if (!sceneArray) {
-    res.status(500).json({ message: 'не найдена сцена' })
+  res.status(200).json(sceneArray)
+})
+
+app.get('/scenes/:name', async (req, res) => {
+  const findScene = await scenes.findOne({ name: req.params.name })
+  if (!findScene) {
+    res.status(500).json({ message: 'Сцена с таким именем не найдена' })
   } else {
-    res.status(200).json(sceneArray)
+    res.status(200).json(findScene)
   }
 })
+app.put('/scenes/:name', async (req, res) => {
+  const editScene = await scenes.findOne({ name: req.params.name })
+  if (!editScene) {
+    res.status(500).json({ message: 'Редактируемая сцена не найдена' })
+  }
 
-app.get('/scenes/:id', async (req, res) => {
-  const findScene = await scenes.findById(req.params.id)
-  res.status(200).json(findScene)
-})
+  editScene.name = req.body.name
+  editScene.text = req.body.text
+  editScene.image = req.body.image
+  editScene.linkArray = req.body.linkArray
 
-app.put('/scenes/:id', async (req, res) => {
-  const newScene = await scenes.findById(req.params.id)
-  newScene.text = req.body.text
-  newScene.image = req.body.image
-  newScene.linkArray = req.body.linkArray
-
-  const resSave = await newScene.save()
+  const resSave = await editScene.save()
   if (!resSave) {
     res.status(500).json({ message: 'Сцена не изменена' })
   } else {
@@ -62,12 +57,13 @@ app.put('/scenes/:id', async (req, res) => {
 
 app.post('/scenes', async (req, res) => {
   const scene = new scenes({
+    name: req.body.name,
     text: req.body.text,
     image: req.body.image,
     linkArray: req.body.linkArray
   })
 
-  const clone = await scenes.findById(req.params.id)
+  const clone = await scenes.findOne({ name: req.body.name })
 
   if (!clone) {
     const resSave = await scene.save()
@@ -80,44 +76,26 @@ app.post('/scenes', async (req, res) => {
     res.status(400).json({ message: 'сцена с таким именем уже существует' })
 })
 
-app.delete('/scenes/:id', async (req, res) => {
-  const deleteScene = await scenes.findById(req.params.id)
+app.delete('/scenes/:name', async (req, res) => {
+  const deleteScene = await scenes.findOne({ name: req.params.name })
 
   if (!deleteScene) {
     res.status(500).json({ message: 'Cцена не найдена' })
   } else {
-    scenes.deleteOne({ id: res.param.id })
+    await scenes.deleteOne({ name: req.params.name })
     res.status(200).json({ message: 'Сцена удалена' })
   }
 })
 
-// app.get('/homepage', async (req, res) => {
-//   const text = `<!DOCTYPE html>
-// <html lang="en">
+app.delete('/scenes', async (req, res) => {
 
-// <head>
-//     <meta charset="UTF-8">
-//     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  scenes.deleteMany({})
+  res.status(200).json({ message: 'Все сцены удалены' })
 
-// </head>
-
-// <body>
-//     <h1>Нажми на кнопку</h1>
-//     <form>
-//         <button type="submit" formaction="http://46.36.223.228:3000/scenes">Получить все</button>
-
-
-//     </form>
-// </body>
-
-// </html>`
-//   res.status(200).send(text)
-// })
+})
 
 app.listen(port, () => {
   console.log('сервер запущен на порту ', port, ' ...')
 })
-
 
 

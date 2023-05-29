@@ -2,6 +2,7 @@ import mongoose, { Schema } from "mongoose"
 
 
 const sceneSchema = new Schema({
+  name: String,
   image: String,
   text: String,
   linkArray: [
