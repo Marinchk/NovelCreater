@@ -1,0 +1,248 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "NovelCon API",
+    "description": "API for Novel Constructor",
+    "version": "1.0.0"
+  },
+  "host": "46.36.223.228:8280",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/scenes": {
+      "get": {
+        "tags": [
+          "Сцены"
+        ],
+        "summary": "Получение всех сцен",
+        "description": "Возвращает массив объектов, где каждый объект является является сценой",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Сцены"
+        ],
+        "summary": "Создание сцены",
+        "description": "Создает новую",
+        "parameters": [
+          {
+            "name": "",
+            "in": "body",
+            "description": "Данные создаваемой сцены",
+            "required": true,
+            "schema": {
+              "$ref": "#/x-post-parameters/scenes"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Сцена создана"
+          },
+          "400": {
+            "description": "Сцена с таким именем уже существует / Нельзя создавать сцену без имени"
+          },
+          "500": {
+            "description": "Сцена не создана"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Сцены"
+        ],
+        "summary": "Удаление всех сцен",
+        "description": "Удаляет все сцены",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Все сцены удалены"
+          }
+        }
+      }
+    },
+    "/scenes/{name}": {
+      "get": {
+        "tags": [
+          "Сцены"
+        ],
+        "summary": "Получение сцены",
+        "description": "Возвращает объект, который является сценой",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Уникальное имя сцены"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/scenes"
+            }
+          },
+          "400": {
+            "description": "Сцена с таким именем не найдена"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Сцены"
+        ],
+        "summary": "Редактирование сцены",
+        "description": "Редактирует сцену с опрделенным именем",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Уникальное имя сцены"
+          },
+          {
+            "name": "",
+            "in": "body",
+            "description": "Данные сцены, которые надо заменить",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/scenes"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Сцена изменена"
+          },
+          "400": {
+            "description": "Редактируемая сцена с таким именем не найдена / Отсутсвует информация для редактирования"
+          },
+          "500": {
+            "description": "Сцена не изменена"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Сцены"
+        ],
+        "summary": "Удаление сцены",
+        "description": "Удаление сцены с определенным именем",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Уникальное имя сцены"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Сцена удалена"
+          },
+          "400": {
+            "description": "Удаляемая сцена с таким именем не найдена"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "scenes": {
+      "type": "object",
+      "description": "Описание отдельной сцены для новеллы",
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Уникальный идентификатор сцены",
+          "example": "hello1"
+        },
+        "text": {
+          "type": "string",
+          "description": "Авторское описание происходящих событий в сцене",
+          "example": "С вами поздоровался красивый программист"
+        },
+        "image": {
+          "type": "string",
+          "description": "Адрес изображения для сцены на сервере",
+          "example": "/home/molneva/myapp/images/hello1.png"
+        },
+        "linkArray": {
+          "type": "array",
+          "description": "Массив вариантов ответов",
+          "items": {
+            "type": "object",
+            "description": "Описание варианта ответа",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Текст ответа",
+                "example": "Сказать привет"
+              },
+              "nextScene": {
+                "type": "string",
+                "description": "Имя сцены, которая последует при выборе данного ответа",
+                "example": "hello2"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-post-parameters": {
+    "scenes": {
+      "type": "object",
+      "description": "Описание отдельной сцены для новеллы",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Уникальный идентификатор сцены",
+          "example": "hello1"
+        },
+        "text": {
+          "type": "string",
+          "description": "Авторское описание происходящих событий в сцене",
+          "example": "С вами поздоровался красивый программист"
+        },
+        "image": {
+          "type": "string",
+          "description": "Адрес изображения для сцены на сервере",
+          "example": "/home/molneva/myapp/images/hello1.png"
+        },
+        "linkArray": {
+          "type": "array",
+          "description": "Массив вариантов ответов",
+          "items": {
+            "type": "object",
+            "description": "Описание варианта ответа",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Текст ответа",
+                "example": "Сказать привет"
+              },
+              "nextScene": {
+                "type": "string",
+                "description": "Имя сцены, которая последует при выборе данного ответа",
+                "example": "hello2"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
