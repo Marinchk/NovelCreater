@@ -25,6 +25,28 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Debug Mocha Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+              "--reporter",
+              "dot",
+              "--slow",
+              "5000",
+              "--colors",
+              "${workspaceFolder}/test/*.test.js",
+      
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "env": {
+              "MONGO_DB": "testNovel"
+            },
+            "skipFiles": [
+              "<node_internals>/**"
+            ]
+          },
+          {
+            "type": "node",
+            "request": "launch",
             "name": "Запустить сервер",
             "skipFiles": [
                 "<node_internals>/**"
