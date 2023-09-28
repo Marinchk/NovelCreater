@@ -1,4 +1,5 @@
 import routerScenes from '../router/scenes.js'
+import bodyParser from 'body-parser'
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import express from 'express'
@@ -12,12 +13,11 @@ const app = express()
 // app.get('/ping', (req, res) => res.json({ pong: true }))
 // app.use(passport.initialize())
 // app.use(passport.session())
+app.use(bodyParser.json())
 app.use('/', routerScenes)
 
 describe('Тесты /scenes', () => {
     beforeEach(async () => {
-        console.log(process.env.MONGO_DB)
-
         await scenes.insertMany([
             {
                 name: 'test1',
@@ -44,9 +44,9 @@ describe('Тесты /scenes', () => {
         ])
     })
 
-    // afterEach(async () => {
-    //     await scenes.deleteMany({})
-    // })
+    afterEach(async () => {
+        await scenes.deleteMany({})
+    })
 
     it('Ping', (done) => {
         chai
@@ -70,6 +70,7 @@ describe('Тесты /scenes', () => {
                     expect(res).to.have.status(400)
                     expect(res.body).to.have.own.property('message')
                     expect(res.body.message).to.eql('Сцена с таким именем не найдена')
+
                     done()
                 })
         })
@@ -103,6 +104,7 @@ describe('Тесты /scenes', () => {
                     expect(res.body).to.be.an('object')
                     expect(res.body).to.have.own.property('name')
                     expect(res.body.name).to.equal('test1')
+
                     done()
                 })
         })
@@ -117,6 +119,7 @@ describe('Тесты /scenes', () => {
                     expect(res).to.have.status(400)
                     expect(res.body).to.have.own.property('message')
                     expect(res.body.message).to.eql('Удаляемая сцена с таким именем не найдена')
+
                     done()
                 })
         })
@@ -129,6 +132,7 @@ describe('Тесты /scenes', () => {
                     expect(res).to.have.status(200)
                     expect(res.body).to.have.own.property('message')
                     expect(res.body.message).to.eql('Сцена удалена')
+
                     done()
                 })
         })
@@ -141,18 +145,17 @@ describe('Тесты /scenes', () => {
                     expect(res).to.have.status(200)
                     expect(res.body).to.have.own.property('message')
                     expect(res.body.message).to.eql('Все сцены удалены')
+
                     done()
                 })
         })
     })
-
-
     describe('Тесты put', () => {
-        it('put', (done) => {
-            chai
+        it('put', async () => {
+
+            const res = await chai
                 .request(app)
                 .put('/test1')
-                .set('Content-Type', 'application/json')
                 .send({
                     name: "test1",
                     text: "editTest1",
@@ -164,17 +167,18 @@ describe('Тесты /scenes', () => {
                         }
                     ]
                 })
-                .end((err, res) => {
-                    expect(err).to.be.null
-                    expect(res).to.have.status(200)
-                    expect(res.body).to.be.an('object')
-                    expect(res.body).to.have.own.property('name')
-                    expect(res.body.name).to.equal('test1')
-                    expect(res.body).to.have.own.property('text')
-                    expect(res.body.name).to.equal('editTest1')
-                    done()
-                })
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('object')
+            expect(res.body).to.have.own.property('message')
+            expect(res.body.message).to.equal('Сцена изменена')
+
+            const scene = await scenes.findOne({ name: "test1" }).lean()
+            expect(scene).to.be.an('object')
+            expect(scene).to.have.own.property('text')
+            expect(scene.text).to.equal("editTest1")
+
         })
+
         it('put ERR NO NAME', (done) => {
             chai
                 .request(app)
