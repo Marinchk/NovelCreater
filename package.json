@@ -5,7 +5,7 @@
   "main": "test_array.js",
   "type": "module",
   "scripts": {
-    "start": "PORT=8280 node server.js",
+    "start": "PORT=8180 node server.js",
     "swagger": "node ./swagger/novelcon.js",
     "test": "MONGO_DB=testNovel mocha test/*.test.js"
   },

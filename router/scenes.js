@@ -71,7 +71,7 @@ routerScenes.put('/:name', async (req, res) => {
     if (!editScene) {
         res.status(400).json({ message: 'Редактируемая сцена с таким именем не найдена' })
     }
-    if (!req.body) {
+    if (Object.keys(req.body).length === 0) {
         res.status(400).json({ message: 'Отсутсвует информация для редактирования' })
     }
 

@@ -10,9 +10,6 @@ const expect = chai.expect
 chai.use(chaiHttp)
 
 const app = express()
-// app.get('/ping', (req, res) => res.json({ pong: true }))
-// app.use(passport.initialize())
-// app.use(passport.session())
 app.use(bodyParser.json())
 app.use('/', routerScenes)
 
@@ -123,18 +120,18 @@ describe('Тесты /scenes', () => {
                     done()
                 })
         })
-        it('delete/scenes', (done) => {
-            chai
+        it('delete/scenes', async () => {
+
+            const res = await chai
                 .request(app)
                 .delete('/test1')
-                .end((err, res) => {
-                    expect(err).to.be.null
-                    expect(res).to.have.status(200)
-                    expect(res.body).to.have.own.property('message')
-                    expect(res.body.message).to.eql('Сцена удалена')
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('object')
+            expect(res.body).to.have.own.property('message')
+            expect(res.body.message).to.equal('Сцена удалена')
 
-                    done()
-                })
+            const scene = await scenes.findOne({ name: "test1" }).lean()
+            expect(scene).to.be.an('null')
         })
         it('delete/scenes all', (done) => {
             chai
@@ -207,9 +204,6 @@ describe('Тесты /scenes', () => {
             chai
                 .request(app)
                 .put('/test1')
-                //.set('X-API-Key', 'foobar')
-                .send({
-                })
                 .end((err, res) => {
                     expect(err).to.be.null
                     expect(res).to.have.status(400)
@@ -220,11 +214,12 @@ describe('Тесты /scenes', () => {
         })
     })
     describe('Тесты post', () => {
-        it('post ', (done) => {
-            chai
+
+        it('post ', async () => {
+
+            const res = await chai
                 .request(app)
                 .post('/')
-                //.set('X-API-Key', 'foobar')
                 .send({
                     "name": "test3",
                     "text": "test3",
@@ -236,16 +231,15 @@ describe('Тесты /scenes', () => {
                         }
                     ]
                 })
-                .end((err, res) => {
-                    expect(err).to.be.null
-                    expect(res).to.have.status(200)
-                    expect(res.body).to.be.an('object')
-                    expect(res.body).to.have.own.property('name')
-                    expect(res.body.name).to.equal('test3')
-                    expect(res.body).to.have.own.property('text')
-                    expect(res.body.name).to.equal('test3')
-                    done()
-                })
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('object')
+            expect(res.body).to.have.own.property('message')
+            expect(res.body.message).to.equal('Сцена создана')
+
+            const scene = await scenes.findOne({ name: "test3" }).lean()
+            expect(scene).to.be.an('object')
+            expect(scene).to.have.own.property('text')
+            expect(scene.text).to.equal("test3")
         })
         it('post ERR NO NAME', (done) => {
             chai
@@ -271,11 +265,11 @@ describe('Тесты /scenes', () => {
                 })
         })
 
-        it('post ERR  NAME EXISTS', (done) => {
-            chai
+        it('post ERR  NAME EXISTS', async () => {
+
+            const res = await chai
                 .request(app)
                 .post('/')
-                .type('form')
                 .send({
                     "name": "test1",
                     "text": "test3",
@@ -287,13 +281,11 @@ describe('Тесты /scenes', () => {
                         }
                     ]
                 })
-                .end((err, res) => {
-                    expect(err).to.be.null
-                    expect(res).to.have.status(400)
-                    expect(res.body).to.have.own.property('message')
-                    expect(res.body.message).to.eql('Сцена с таким именем уже существует')
-                    done()
-                })
+            expect(res).to.have.status(400)
+            expect(res.body).to.be.an('object')
+            expect(res.body).to.have.own.property('message')
+            expect(res.body.message).to.equal('Сцена с таким именем уже существует')
+
         })
     })
 })
